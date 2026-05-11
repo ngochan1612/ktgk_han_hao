@@ -8,15 +8,20 @@ import 'screens/cuisine_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/food_list_screen.dart';
 import 'screens/payment_success_screen.dart';
+import 'services/hive_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await HiveService.init();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AppProvider(),
-      child: const MyApp(),
-    ),
+    ChangeNotifierProvider(create: (_) => AppProvider(), child: const MyApp()),
   );
 }
 

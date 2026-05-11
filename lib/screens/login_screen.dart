@@ -16,32 +16,85 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void handleLogin() {
+  void handleLogin() async {
+    // 1. Thêm async ở đây
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    // ... (phần kiểm tra trống giữ nguyên)
+
     final provider = Provider.of<AppProvider>(context, listen: false);
-    final success = provider.login(
-      emailController.text.trim(),
-      passwordController.text.trim(),
-    );
+
+    // 2. Thêm await ở đây để biến Future<bool> thành bool
+    final success = await provider.login(email, password);
+
     if (success) {
+      // Bây giờ success đã là kiểu bool, không còn lỗi nữa
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => CuisineScreen()),
+        MaterialPageRoute(builder: (_) => const CuisineScreen()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sai email hoặc password!')),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Sai email hoặc password!')));
     }
+  }
+
+  void showTestAccounts() {
+    final provider = Provider.of<AppProvider>(context, listen: false);
+    final users = provider.getAllUsers();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Danh sách tài khoản (Test)"),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: users.isEmpty
+              ? const Text("Chưa có tài khoản nào trong Hive.")
+              : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: users.length,
+                  itemBuilder: (context, index) {
+                    final user = users[index];
+                    return ListTile(
+                      title: Text("User: ${user['fullName']}"),
+                      subtitle: Text(
+                        "Email: ${user['email']}\nPass: ${user['password']}",
+                      ),
+                      isThreeLine: true,
+                      onTap: () {
+                        // Tự động điền khi bấm vào tài khoản trong list test
+                        emailController.text = user['email'];
+                        passwordController.text = user['password'];
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Đóng"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 80),
             const Text(
               'Restaurant App',
               style: TextStyle(
@@ -73,7 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
               child: TextButton(
                 onPressed: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => ForgotPasswordScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const ForgotPasswordScreen(),
+                  ),
                 ),
                 child: const Text(
                   'Forgot Password?',
@@ -81,7 +136,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 24),
+
+            // NÚT XEM DANH SÁCH TEST
+            TextButton.icon(
+              onPressed: showTestAccounts,
+              icon: const Icon(Icons.bug_report, color: Colors.grey),
+              label: const Text(
+                "Xem danh sách tài khoản test",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -92,7 +159,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text('Sign In', style: TextStyle(color: Colors.black)),
+                child: const Text(
+                  'Sign In',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -101,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: ElevatedButton(
                 onPressed: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => SignUpScreen()),
+                  MaterialPageRoute(builder: (_) => const SignUpScreen()),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.indigo,
@@ -109,7 +179,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
+                child: const Text(
+                  'Sign Up',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

@@ -1,3 +1,4 @@
+// lib/screens/cuisine_screen.dart
 import '../main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ class CuisineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AppProvider>(context);
+    final user = provider.userLogin;
 
     void goToLogin() {
       navigatorKey.currentState!.pushAndRemoveUntil(
@@ -21,109 +23,125 @@ class CuisineScreen extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
-        title: const Text('Restaurant App'),
+        backgroundColor: const Color(0xFFF2F2F2),
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Restaurant App',
+          style: TextStyle(
+            color: Color(0xFFC62828),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        // Nút mở Drawer (Hamburger menu)
+        leading: Builder(
+          builder: (ctx) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.black),
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
+          ),
+        ),
         actions: [
           Stack(
+            alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.shopping_cart),
+                icon: const Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Colors.black,
+                ),
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const CartScreen()),
                 ),
               ),
-              if (provider.cartCount > 0)
+              if (provider.cart.isNotEmpty)
                 Positioned(
-                  right: 6,
-                  top: 6,
+                  right: 8,
+                  top: 8,
                   child: CircleAvatar(
-                    radius: 9,
+                    radius: 8,
                     backgroundColor: Colors.red,
                     child: Text(
-                      '${provider.cartCount}',
-                      style: const TextStyle(fontSize: 11, color: Colors.white),
+                      '${provider.cart.length}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
             ],
           ),
-          if (provider.userLogin == null)
-            IconButton(
-              icon: const Icon(Icons.login),
-              onPressed: goToLogin,
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () {
+        ],
+      ),
+      // THÊM DRAWER THEO YÊU CẦU CỦA ĐỀ THI
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFFC62828)),
+              accountName: Text(user?['fullName'] ?? 'Khách hàng'),
+              accountEmail: Text(user?['email'] ?? 'Chưa đăng nhập'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Đăng xuất'),
+              onTap: () {
                 provider.logout();
                 goToLogin();
               },
             ),
-        ],
+          ],
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (provider.userLogin != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Text(
-                  'Xin chào, ${provider.userLogin!['fullName']}!',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            const Text(
-              'Cuisine',
-              style: TextStyle(
-                fontSize: 20,
+            Text(
+              'Xin chào! ${user?['fullName'] ?? 'Khách hàng'}!',
+              style: const TextStyle(
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Colors.red,
+                color: Colors.black87,
               ),
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
+              child: ListView.builder(
                 itemCount: provider.allCuisines.length,
                 itemBuilder: (context, index) {
                   final cuisine = provider.allCuisines[index];
-                  return GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => FoodListScreen(cuisine: cuisine),
+                  return Card(
+                    color: Colors.white,
+                    elevation: 0.5,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: Text(
+                        cuisine['image'],
+                        style: const TextStyle(fontSize: 24),
                       ),
-                    ),
-                    child: Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      title: Text(
+                        cuisine['name'],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            cuisine['image'],
-                            style: const TextStyle(fontSize: 48),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            cuisine['name'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
+                      trailing: const Icon(
+                        Icons.chevron_right,
+                        color: Colors.grey,
+                      ),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FoodListScreen(cuisine: cuisine),
+                        ),
                       ),
                     ),
                   );
