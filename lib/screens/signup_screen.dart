@@ -14,30 +14,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final passwordController = TextEditingController();
   final fullNameController = TextEditingController();
 
+  // FIX: Thêm async và await
   void handleSignUp() async {
-    // 1. Thêm async
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final fullName = fullNameController.text.trim();
 
-    // ... (phần kiểm tra rỗng giữ nguyên)
+    if (email.isEmpty || password.isEmpty || fullName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng điền đủ thông tin!')),
+      );
+      return;
+    }
 
     final provider = Provider.of<AppProvider>(context, listen: false);
-
-    // 2. Thêm await ở đây
     final success = await provider.register(email, password, fullName);
 
+    if (!mounted) return;
+
     if (success) {
-      // Hết lỗi báo đỏ
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tạo tài khoản thành công!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Đăng ký thành công!')));
       Navigator.pop(context);
     } else {
-      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email đã tồn tại hoặc lỗi kết nối!')),
+        const SnackBar(content: Text('Email đã tồn tại hoặc lỗi mạng!')),
       );
     }
   }
@@ -45,65 +47,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: AppBar(title: const Text("Sign Up")),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Sign Up',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
-            ),
-            const SizedBox(height: 40),
             TextField(
               controller: fullNameController,
-              decoration: const InputDecoration(
-                hintText: 'Username',
-                border: UnderlineInputBorder(),
-              ),
+              decoration: const InputDecoration(hintText: 'Full Name'),
             ),
-            const SizedBox(height: 16),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(
-                hintText: 'Email',
-                border: UnderlineInputBorder(),
-              ),
+              decoration: const InputDecoration(hintText: 'Email'),
             ),
-            const SizedBox(height: 16),
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: const InputDecoration(
-                hintText: 'Password',
-                border: UnderlineInputBorder(),
-              ),
+              decoration: const InputDecoration(hintText: 'Password'),
             ),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: handleSignUp,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade300,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Text(
-                  'Sign Up',
-                  style: TextStyle(color: Colors.black),
-                ),
+                child: const Text('Register'),
               ),
             ),
           ],

@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBpA43zMmddeW21hxI7HXlfggeSyHsZBA8',
-    appId: '1:282030367496:web:3fbacf9de28ab0f44082bd',
-    messagingSenderId: '282030367496',
-    projectId: 'restaurant-a321f',
-    authDomain: 'restaurant-a321f.firebaseapp.com',
-    storageBucket: 'restaurant-a321f.firebasestorage.app',
-    measurementId: 'G-81M3NLV0WD',
+    apiKey: 'AIzaSyD_dH3Gf_FAv84qWMrp1NLb71T1KdZ5cLk',
+    appId: '1:976694098957:web:06f1bee6b4708dc29d2944',
+    messagingSenderId: '976694098957',
+    projectId: 'restaurant-7d5e1',
+    authDomain: 'restaurant-7d5e1.firebaseapp.com',
+    storageBucket: 'restaurant-7d5e1.firebasestorage.app',
+    measurementId: 'G-FW1DKHJDG5',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD_SEHQkN4-_LPpnJyh3QbrAhlvmxMJwHk',
-    appId: '1:282030367496:android:5ad4be150813dfec4082bd',
-    messagingSenderId: '282030367496',
-    projectId: 'restaurant-a321f',
-    storageBucket: 'restaurant-a321f.firebasestorage.app',
+    apiKey: 'AIzaSyB-5AixR5zcz7dWVI9hYp6rHQr7wMz82sk',
+    appId: '1:976694098957:android:05d34e4b2cb4a1459d2944',
+    messagingSenderId: '976694098957',
+    projectId: 'restaurant-7d5e1',
+    storageBucket: 'restaurant-7d5e1.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAW-1miQUjFvdLrT2FCNWqD7M1C7mBcLvs',
-    appId: '1:282030367496:ios:bec14a96b5ba0ba04082bd',
-    messagingSenderId: '282030367496',
-    projectId: 'restaurant-a321f',
-    storageBucket: 'restaurant-a321f.firebasestorage.app',
+    apiKey: 'AIzaSyCdSCd8muOHc7Zz_2ijrWF0r0T_TPtPAZU',
+    appId: '1:976694098957:ios:deb080d57e7f2dea9d2944',
+    messagingSenderId: '976694098957',
+    projectId: 'restaurant-7d5e1',
+    storageBucket: 'restaurant-7d5e1.firebasestorage.app',
     iosBundleId: 'com.example.flutterRestaurantApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAW-1miQUjFvdLrT2FCNWqD7M1C7mBcLvs',
-    appId: '1:282030367496:ios:bec14a96b5ba0ba04082bd',
-    messagingSenderId: '282030367496',
-    projectId: 'restaurant-a321f',
-    storageBucket: 'restaurant-a321f.firebasestorage.app',
+    apiKey: 'AIzaSyCdSCd8muOHc7Zz_2ijrWF0r0T_TPtPAZU',
+    appId: '1:976694098957:ios:deb080d57e7f2dea9d2944',
+    messagingSenderId: '976694098957',
+    projectId: 'restaurant-7d5e1',
+    storageBucket: 'restaurant-7d5e1.firebasestorage.app',
     iosBundleId: 'com.example.flutterRestaurantApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBpA43zMmddeW21hxI7HXlfggeSyHsZBA8',
-    appId: '1:282030367496:web:5859ad33927119804082bd',
-    messagingSenderId: '282030367496',
-    projectId: 'restaurant-a321f',
-    authDomain: 'restaurant-a321f.firebaseapp.com',
-    storageBucket: 'restaurant-a321f.firebasestorage.app',
-    measurementId: 'G-LWF2XRTBQ5',
+    apiKey: 'AIzaSyD_dH3Gf_FAv84qWMrp1NLb71T1KdZ5cLk',
+    appId: '1:976694098957:web:8459d8792cdeca759d2944',
+    messagingSenderId: '976694098957',
+    projectId: 'restaurant-7d5e1',
+    authDomain: 'restaurant-7d5e1.firebaseapp.com',
+    storageBucket: 'restaurant-7d5e1.firebasestorage.app',
+    measurementId: 'G-J7NM793SRY',
   );
+
 }

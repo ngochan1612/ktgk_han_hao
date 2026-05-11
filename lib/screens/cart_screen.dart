@@ -1,4 +1,3 @@
-// lib/screens/cart_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../store/app_provider.dart';
@@ -69,7 +68,6 @@ class CartScreen extends StatelessWidget {
                                   InkWell(
                                     onTap: () {
                                       if (item['quantity'] == 1) {
-                                        // Hiện Dialog xác nhận xóa khi số lượng lùi về 0
                                         showDialog(
                                           context: context,
                                           builder: (ctx) => AlertDialog(
@@ -80,87 +78,39 @@ class CartScreen extends StatelessWidget {
                                               ),
                                             ),
                                             content: Text(
-                                              'Bạn có chắc muốn xóa ${item['name']} khỏi giỏ hàng?',
+                                              'Xóa ${item['name']} khỏi giỏ hàng?',
                                             ),
                                             actions: [
                                               TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                  ctx,
-                                                ), // Tắt Dialog
-                                                child: const Text(
-                                                  'Hủy',
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
+                                                onPressed: () =>
+                                                    Navigator.pop(ctx),
+                                                child: const Text('Hủy'),
                                               ),
                                               ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Colors.green.shade700,
-                                                  shape:
-                                                      const RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.zero,
-                                                      ),
-                                                ),
-                                                onPressed: () async {
-                                                  // Thêm async
-                                                  final total =
-                                                      provider.totalPay;
-
-                                                  // UI CHỈ CẦN GỌI PROVIDER, KHÔNG CẦN QUAN TÂM FIREBASE HAY HIVE
-                                                  bool success = await provider
-                                                      .checkoutAndSyncToFirebase();
-
-                                                  if (success) {
-                                                    // Chuyển sang màn hình thành công
-                                                    Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            PaymentSuccessScreen(
-                                                              total: total,
-                                                            ),
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    // Báo lỗi nếu rớt mạng hoặc chưa đăng nhập
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text(
-                                                          'Thanh toán thất bại, vui lòng thử lại!',
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
+                                                onPressed: () {
+                                                  provider.updateQuantity(
+                                                    item['id'],
+                                                    -1,
+                                                  );
+                                                  Navigator.pop(ctx);
                                                 },
-                                                child: const Text(
-                                                  'Proceed To Pay',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
+                                                child: const Text('Xóa'),
                                               ),
                                             ],
                                           ),
                                         );
                                       } else {
-                                        // Nếu số lượng > 1 thì cứ trừ bình thường
                                         provider.updateQuantity(item['id'], -1);
                                       }
                                     },
                                     child: const Padding(
                                       padding: EdgeInsets.symmetric(
-                                        horizontal: 8,
+                                        horizontal: 12,
                                       ),
                                       child: Text(
                                         '-',
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -178,13 +128,13 @@ class CartScreen extends StatelessWidget {
                                         provider.updateQuantity(item['id'], 1),
                                     child: const Padding(
                                       padding: EdgeInsets.symmetric(
-                                        horizontal: 8,
+                                        horizontal: 12,
                                       ),
                                       child: Text(
                                         '+',
                                         style: TextStyle(
                                           color: Colors.green,
-                                          fontSize: 18,
+                                          fontSize: 20,
                                         ),
                                       ),
                                     ),
@@ -193,14 +143,10 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 16),
-                            SizedBox(
-                              width: 50,
-                              child: Text(
-                                '₹${item['price']}',
-                                textAlign: TextAlign.right,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            Text(
+                              '₹${item['price'] * item['quantity']}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
@@ -209,38 +155,7 @@ class CartScreen extends StatelessWidget {
                     },
                   ),
                 ),
-                // Phần Hóa đơn Bill Receipt
-                Container(
-                  color: Colors.white,
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Bill Receipt',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildRow('Items Total', '${provider.itemsTotal} ₹'),
-                      _buildRow('Offer Discount', '-18 ₹'),
-                      _buildRow(
-                        'Taxes (8%)',
-                        '${(provider.itemsTotal * 0.08).toStringAsFixed(2)} ₹',
-                      ),
-                      _buildRow('Delivery Charges', '30 ₹'),
-                      const Divider(),
-                      _buildRow(
-                        'Total Pay',
-                        '${provider.totalPay.toStringAsFixed(2)} ₹',
-                        bold: true,
-                      ),
-                    ],
-                  ),
-                ),
+                _buildBillReceipt(provider),
               ],
             ),
       bottomNavigationBar: provider.cart.isEmpty
@@ -275,16 +190,31 @@ class CartScreen extends StatelessWidget {
                             borderRadius: BorderRadius.zero,
                           ),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           final total = provider.totalPay;
-                          provider.clearCart();
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  PaymentSuccessScreen(total: total),
-                            ),
-                          );
+                          // Gọi hàm đẩy dữ liệu lên Firebase
+                          bool success = await provider
+                              .checkoutAndSyncToFirebase();
+
+                          if (success) {
+                            if (!context.mounted) return;
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    PaymentSuccessScreen(total: total),
+                              ),
+                            );
+                          } else {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Thanh toán thất bại, hãy thử lại!',
+                                ),
+                              ),
+                            );
+                          }
                         },
                         child: const Text(
                           'Proceed To Pay',
@@ -302,23 +232,46 @@ class CartScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildBillReceipt(AppProvider provider) {
+    return Container(
+      color: Colors.white,
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildRow('Items Total', '${provider.itemsTotal} ₹'),
+          _buildRow('Offer Discount', '-18 ₹'),
+          _buildRow(
+            'Taxes (8%)',
+            '${(provider.itemsTotal * 0.08).toStringAsFixed(2)} ₹',
+          ),
+          _buildRow('Delivery Charges', '30 ₹'),
+          const Divider(),
+          _buildRow(
+            'Total Pay',
+            '${provider.totalPay.toStringAsFixed(2)} ₹',
+            bold: true,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildRow(String label, String value, {bool bold = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: TextStyle(
-              fontSize: 14,
               fontWeight: bold ? FontWeight.bold : FontWeight.normal,
             ),
           ),
           Text(
             value,
             style: TextStyle(
-              fontSize: 14,
               fontWeight: bold ? FontWeight.bold : FontWeight.normal,
             ),
           ),
