@@ -17,12 +17,12 @@ final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   await HiveService.init();
 
-  runApp(
-    ChangeNotifierProvider(create: (_) => AppProvider(), child: const MyApp()),
-  );
+  final provider = AppProvider();
+  await provider.syncAllDataToFirebase();
+
+  runApp(ChangeNotifierProvider(create: (_) => provider, child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
