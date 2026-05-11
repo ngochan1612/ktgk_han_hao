@@ -14,21 +14,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final passwordController = TextEditingController();
   final fullNameController = TextEditingController();
 
-  void handleSignUp() {
+  void handleSignUp() async {
+    // 1. Thêm async
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final fullName = fullNameController.text.trim();
+
+    // ... (phần kiểm tra rỗng giữ nguyên)
+
     final provider = Provider.of<AppProvider>(context, listen: false);
-    final success = provider.register(
-      emailController.text.trim(),
-      passwordController.text.trim(),
-      fullNameController.text.trim(),
-    );
+
+    // 2. Thêm await ở đây
+    final success = await provider.register(email, password, fullName);
+
     if (success) {
+      // Hết lỗi báo đỏ
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Tạo tài khoản thành công!')),
       );
       Navigator.pop(context);
     } else {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email đã tồn tại!')),
+        const SnackBar(content: Text('Email đã tồn tại hoặc lỗi kết nối!')),
       );
     }
   }
@@ -91,7 +100,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text('Sign Up', style: TextStyle(color: Colors.black)),
+                child: const Text(
+                  'Sign Up',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ),
           ],
